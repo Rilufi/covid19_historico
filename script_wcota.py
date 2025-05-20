@@ -12,7 +12,7 @@ plt.rcParams['figure.dpi'] = 100
 plt.rcParams['savefig.dpi'] = 300
 
 # Criar diretórios
-img_dir = Path("imgs/historic")
+img_dir = Path("imgs")
 img_dir.mkdir(parents=True, exist_ok=True)
 
 # URL do dataset
