@@ -8,7 +8,7 @@ df = pd.read_csv("brazil_covid19.csv")
 df['data'] = pd.to_datetime(df['data'])
 
 # Pasta de imagens
-img_dir = Path("imgs")
+img_dir = Path("data")
 img_dir.mkdir(exist_ok=True)
 
 # Gráfico 1: Casos e mortes acumuladas
