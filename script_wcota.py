@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 import requests
 from io import StringIO
+from matplotlib.dates import DateFormatter
 
 # Criar diretório de saída
 img_dir = Path("imgs")
@@ -52,6 +53,9 @@ df_est = df_est.groupby(["date", "state"]).sum().reset_index()
 df_est.set_index("date", inplace=True)
 df_est = df_est.groupby("state")[["newCases", "newDeaths"]].resample("W").sum().reset_index()
 
+# Definir o formato da data
+date_format = DateFormatter("%d/%m/%Y")
+
 plt.figure(figsize=(10, 5))
 for estado in estados:
     subset = df_est[df_est["state"] == estado]
@@ -60,6 +64,9 @@ plt.title("Casos semanais por estado")
 plt.ylabel("Casos por semana")
 plt.legend()
 plt.grid(True)
+# Aplicar o formato de data
+plt.gca().xaxis.set_major_formatter(date_format)
+plt.gcf().autofmt_xdate()  # Rotacionar as labels para melhor visualização
 plt.tight_layout()
 plt.savefig(img_dir / "estados_casos.png")
 plt.close()
@@ -72,6 +79,9 @@ plt.title("Mortes semanais por estado")
 plt.ylabel("Mortes por semana")
 plt.legend()
 plt.grid(True)
+# Aplicar o formato de data
+plt.gca().xaxis.set_major_formatter(date_format)
+plt.gcf().autofmt_xdate()  # Rotacionar as labels para melhor visualização
 plt.tight_layout()
 plt.savefig(img_dir / "estados_mortes.png")
 plt.close()
