@@ -1,30 +1,47 @@
+# 📊 Gráficos Históricos da COVID-19 no Brasil
 
-# Análise Histórica da COVID-19 no Brasil
+Este projeto gera automaticamente gráficos informativos sobre a pandemia de COVID-19 no Brasil com dados atualizados diariamente. Ele utiliza como fonte a base pública mantida por [@wcota](https://github.com/wcota/covid19br) com dados por estado brasileiro.
 
-Este repositório contém gráficos gerados a partir de dois conjuntos de dados diferentes sobre a pandemia de COVID-19 no Brasil:
+## 🧾 Dados Utilizados
 
-- **Our World in Data** (`owid-covid-data.csv`)
-- **Kaggle - wcota/covid19br** (`brazil_covid19.csv`)
+- Fonte: [Painel COVID-19 Brasil - GitHub](https://github.com/wcota/covid19br)
+- Dataset: `cases-brazil-states.csv` (acessado via HTTP diretamente, sem salvar localmente)
 
-## Scripts
+---
 
-- `script_kaggle.py`: gera gráficos históricos com base nos dados do Kaggle.
-- `script_owid.py`: gera gráficos históricos com base nos dados do OWID.
+## 📈 Gráficos Gerados
 
-## Como Executar
+As imagens são salvas na pasta `imgs/`:
 
-Ambos os scripts podem ser executados via GitHub Actions manualmente (workflow_dispatch). Após a execução, os gráficos estarão na pasta `imgs/`.
+- **Casos semanais acumulados no Brasil** 
+- **Mortes semanais no Brasil**  
+- **Casos semanais por estado**: SP, RJ, RS, BA, MG  
+- **Mortes semanais por estado**: SP, RJ, RS, BA, MG  
 
-## Gráficos Produzidos
+Visualizações ideais para análise de tendências regionais e acompanhamento histórico.
 
-- Casos e mortes acumuladas
-- Novos casos por dia
-- Novas mortes por dia
-- Vacinação total (OWID)
+---
 
-## Workflows
+## ⚙️ Como Executar Localmente
 
-Estão incluídos dois workflows que você pode acionar manualmente na aba *Actions* do GitHub:
+1. Instale os pacotes necessários:
 
-- `.github/workflows/owid.yml`
-- `.github/workflows/kaggle.yml`
+```
+bash
+pip install pandas matplotlib requests
+```
+
+Execute o script:
+```
+python script_wcota.py
+```
+
+As imagens serão salvas na pasta imgs/.
+
+## 🔁 Workflow
+Este projeto possui um workflow do GitHub Actions configurado para rodar manualmente, baixando os dados e recriando os gráficos automaticamente.
+
+---
+
+- *Criado por Yuri Abuchaim · [rilufi.github.io](https://rilufi.github.io)*
+- *Contato · 📧 [yuri.abuchaim@gmail.com](mailto:yuri.abuchaim@gmail.com)*
