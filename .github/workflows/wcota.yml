@@ -1,0 +1,37 @@
+name: Gráficos COVID wcota
+
+on:
+  schedule:
+    - cron: '0 10 * * *'  # Todos os dias às 10h UTC
+  workflow_dispatch:
+
+jobs:
+  graficos:
+    name: Gerar gráficos
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clonar repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Instalar dependências
+        run: |
+          pip install --upgrade pip
+          pip install pandas matplotlib requests
+
+      - name: Executar script principal
+        run: python script_wcota.py
+
+      - name: Commit e push dos gráficos atualizados
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add imgs/
+          timestamp=$(date -u)
+          git commit -m "Atualização automática dos gráficos COVID: ${timestamp}" || echo "Sem mudanças"
+          git push
