@@ -1,8 +1,8 @@
 name: Gráficos COVID wcota
 
 on:
-  schedule:
-    - cron: '0 10 * * *'  # Todos os dias às 10h UTC
+#  schedule:
+#    - cron: '0 10 * * *'  # Todos os dias às 10h UTC
   workflow_dispatch:
 
 jobs:
@@ -22,7 +22,7 @@ jobs:
       - name: Instalar dependências
         run: |
           pip install --upgrade pip
-          pip install pandas matplotlib requests
+          pip install -r requirements.txt
 
       - name: Executar script principal
         run: python script_wcota.py
