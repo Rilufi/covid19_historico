@@ -3,843 +3,231 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
 from matplotlib.dates import DateFormatter, WeekdayLocator
 from datetime import timedelta
-from pandas.plotting import register_matplotlib_converters
+from pathlib import Path
+import os
+
+# Configurações iniciais
+plt.style.use('ggplot')
 register_matplotlib_converters()
 
-# Step 1: Load the data
-df = pd.read_csv(
-    'https://covid.ourworldindata.org/data/owid-covid-data.csv',
-    usecols=['date', 'location', 'new_deaths_smoothed'],
-    parse_dates=['date'])
-
-countries = ['World']
-df = df[df['location'].isin(countries)]
-
-
-
-# Step 2: Summarize the data
-pivot = pd.pivot_table(
-    data=df,                                    # What dataframe to use
-    index='date',                               # The "rows" of your dataframe
-    columns='location',                         # What values to show as columns
-    values='new_deaths_smoothed',   		# What values to aggregate
-    aggfunc='mean',                             # How to aggregate data
-    )
-
-pivot = pivot.fillna(method='ffill')
-
-
-# Step 3: Set up key variables for the visualization
-main_country = 'Brazil'
-colors = {country:('black' if country!= main_country else '#129583') for country in countries}
-alphas = {country:(0.5 if country!= main_country else 1.0) for country in countries}
-
-
-# Step 4: Plot all countries
-fig, ax = plt.subplots(figsize=(12,8))
-fig.patch.set_facecolor('#F5F5F5')    # Change background color to a light grey
-ax.patch.set_facecolor('#F5F5F5')     # Change background color to a light grey
-
-for country in countries:
-    ax.plot(
-        pivot.index,              # What to use as your x-values
-        pivot[country],           # What to use as your y-values
-        color=colors[country],    # How to color your line
-        alpha=alphas[country]     # What transparency to use for your line
-    )
-    ax.text(
-        x = pivot.index[-1] + timedelta(days=2),    # Where to position your text relative to the x-axis
-        y = pivot[country].max(),                   # How high to position your text
-        color = colors[country],
-        fontsize=13,                   # What color to give your text
-        s = country,                                # What to write
-        alpha=alphas[country]                       # What transparency to use
-    )
-
-
-# Step 5: Configures axes
-## A) Format what shows up on axes and how it's displayed
-date_form = DateFormatter("%d-%m-%Y")
-ax.xaxis.set_major_locator(WeekdayLocator(byweekday=(0), interval=3))
-ax.xaxis.set_major_formatter(date_form)
-plt.xticks(rotation=45, fontsize=12)
-#plt.ylim(0,100)
-
-## B) Customizing axes and adding a grid
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
-ax.spines['bottom'].set_color('#3f3f3f')
-ax.spines['left'].set_color('#3f3f3f')
-ax.tick_params(colors='#3f3f3f')
-ax.grid(alpha=1)
-
-## C) Adding a title and axis labels
-plt.ylabel('Novas mortes diárias no mundo', fontsize=18, alpha=0.9)
-plt.xlabel('Data', fontsize=12, alpha=0.9)
-plt.title('Mortes em 24h por COVID-19 no mundo', fontsize=18, weight='bold', alpha=0.9)
-
-# D) Celebrate!
-plt.savefig("data/world_deaths")
-
-
-
-# Step 1: Load the data
-df = pd.read_csv(
-    'https://covid.ourworldindata.org/data/owid-covid-data.csv',
-    usecols=['date', 'location', 'new_cases_smoothed'],
-    parse_dates=['date'])
-
-countries = ['World']
-df = df[df['location'].isin(countries)]
-
-
-
-# Step 2: Summarize the data
-pivot = pd.pivot_table(
-    data=df,                                    # What dataframe to use
-    index='date',                               # The "rows" of your dataframe
-    columns='location',                         # What values to show as columns
-    values='new_cases_smoothed',   		# What values to aggregate
-    aggfunc='mean',                             # How to aggregate data
-    )
-
-pivot = pivot.fillna(method='ffill')
-
-
-# Step 3: Set up key variables for the visualization
-main_country = 'Brazil'
-colors = {country:('black' if country!= main_country else '#129583') for country in countries}
-alphas = {country:(0.5 if country!= main_country else 1.0) for country in countries}
-
-
-# Step 4: Plot all countries
-fig, ax = plt.subplots(figsize=(12,8))
-fig.patch.set_facecolor('#F5F5F5')    # Change background color to a light grey
-ax.patch.set_facecolor('#F5F5F5')     # Change background color to a light grey
-
-for country in countries:
-    ax.plot(
-        pivot.index,              # What to use as your x-values
-        pivot[country],           # What to use as your y-values
-        color=colors[country],    # How to color your line
-        alpha=alphas[country]     # What transparency to use for your line
-    )
-    ax.text(
-        x = pivot.index[-1] + timedelta(days=2),    # Where to position your text relative to the x-axis
-        y = pivot[country].max(),                   # How high to position your text
-        color = colors[country],
-        fontsize=13,                   # What color to give your text
-        s = country,                                # What to write
-        alpha=alphas[country]                       # What transparency to use
-    )
-
-
-# Step 5: Configures axes
-## A) Format what shows up on axes and how it's displayed
-date_form = DateFormatter("%d-%m-%Y")
-ax.xaxis.set_major_locator(WeekdayLocator(byweekday=(0), interval=3))
-ax.xaxis.set_major_formatter(date_form)
-plt.xticks(rotation=45, fontsize=12)
-#plt.ylim(0,100)
-
-## B) Customizing axes and adding a grid
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
-ax.spines['bottom'].set_color('#3f3f3f')
-ax.spines['left'].set_color('#3f3f3f')
-ax.tick_params(colors='#3f3f3f')
-ax.grid(alpha=1)
-
-## C) Adding a title and axis labels
-plt.ylabel('Novos casos diários no mundo', fontsize=18, alpha=0.9)
-plt.xlabel('Data', fontsize=12, alpha=0.9)
-plt.title('Novos casos mundiais COVID-19', fontsize=18, weight='bold', alpha=0.9)
-
-# D) Celebrate!
-plt.savefig("data/world_cases")
-
-
-# Step 1: Load the data
-df = pd.read_csv(
-    'https://covid.ourworldindata.org/data/owid-covid-data.csv',
-    usecols=['date', 'location', 'new_cases_smoothed'],
-    parse_dates=['date'])
-
-countries = ['Brazil']
-df = df[df['location'].isin(countries)]
-
-
-
-# Step 2: Summarize the data
-pivot = pd.pivot_table(
-    data=df,                                    # What dataframe to use
-    index='date',                               # The "rows" of your dataframe
-    columns='location',                         # What values to show as columns
-    values='new_cases_smoothed',   		# What values to aggregate
-    aggfunc='mean',                             # How to aggregate data
-    )
-
-pivot = pivot.fillna(method='ffill')
-
-
-# Step 3: Set up key variables for the visualization
-main_country = 'Brazil'
-colors = {country:('black' if country!= main_country else '#129583') for country in countries}
-alphas = {country:(0.5 if country!= main_country else 1.0) for country in countries}
-
-
-# Step 4: Plot all countries
-fig, ax = plt.subplots(figsize=(12,8))
-fig.patch.set_facecolor('#F5F5F5')    # Change background color to a light grey
-ax.patch.set_facecolor('#F5F5F5')     # Change background color to a light grey
-
-for country in countries:
-    ax.plot(
-        pivot.index,              # What to use as your x-values
-        pivot[country],           # What to use as your y-values
-        color=colors[country],    # How to color your line
-        alpha=alphas[country]     # What transparency to use for your line
-    )
-    ax.text(
-        x = pivot.index[-1] + timedelta(days=2),    # Where to position your text relative to the x-axis
-        y = pivot[country].max(),                   # How high to position your text
-        color = colors[country],
-        fontsize=13,                   # What color to give your text
-        s = country,                                # What to write
-        alpha=alphas[country]                       # What transparency to use
-    )
-
-
-# Step 5: Configures axes
-## A) Format what shows up on axes and how it's displayed
-date_form = DateFormatter("%d-%m-%Y")
-ax.xaxis.set_major_locator(WeekdayLocator(byweekday=(0), interval=3))
-ax.xaxis.set_major_formatter(date_form)
-plt.xticks(rotation=45, fontsize=12)
-#plt.ylim(0,100)
-
-## B) Customizing axes and adding a grid
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
-ax.spines['bottom'].set_color('#3f3f3f')
-ax.spines['left'].set_color('#3f3f3f')
-ax.tick_params(colors='#3f3f3f')
-ax.grid(alpha=1)
-
-## C) Adding a title and axis labels
-plt.ylabel('Novos casos diários no Brasil', fontsize=18, alpha=0.9)
-plt.xlabel('Data', fontsize=12, alpha=0.9)
-plt.title('Novos casos COVID-19 no Brasil', fontsize=18, weight='bold', alpha=0.9)
-
-# D) Celebrate!
-plt.savefig("data/br_cases")
-
-
-
-# Step 1: Load the data
-df = pd.read_csv(
-    'https://covid.ourworldindata.org/data/owid-covid-data.csv',
-    usecols=['date', 'location', 'total_vaccinations_per_hundred'],
-    parse_dates=['date'])
-
-countries = ['United States', 'Germany', 'United Kingdom', 'Brazil', 'Argentina', 'Chile', 'Uruguay']
-df = df[df['location'].isin(countries)]
-
-
-
-# Step 2: Summarize the data
-pivot = pd.pivot_table(
-    data=df,                                    # What dataframe to use
-    index='date',                               # The "rows" of your dataframe
-    columns='location',                         # What values to show as columns
-    values='total_vaccinations_per_hundred',    # What values to aggregate
-    aggfunc='mean',                             # How to aggregate data
-    )
-
-pivot = pivot.fillna(method='ffill')
-
-
-# Step 3: Set up key variables for the visualization
-main_country = 'Brazil'
-colors = {country:('black' if country!= main_country else '#129583') for country in countries}
-alphas = {country:(0.5 if country!= main_country else 1.0) for country in countries}
-
-
-# Step 4: Plot all countries
-fig, ax = plt.subplots(figsize=(12,8))
-fig.patch.set_facecolor('#F5F5F5')    # Change background color to a light grey
-ax.patch.set_facecolor('#F5F5F5')     # Change background color to a light grey
-
-for country in countries:
-    ax.plot(
-        pivot.index,              # What to use as your x-values
-        pivot[country],           # What to use as your y-values
-        color=colors[country],    # How to color your line
-        alpha=alphas[country]     # What transparency to use for your line
-    )
-    ax.text(
-        x = pivot.index[-1] + timedelta(days=2),    # Where to position your text relative to the x-axis
-        y = pivot[country].max(),                   # How high to position your text
-        color = colors[country],
-        fontsize=13,                   # What color to give your text
-        s = country,                                # What to write
-        alpha=alphas[country]                       # What transparency to use
-    )
-
-
-# Step 5: Configures axes
-## A) Format what shows up on axes and how it's displayed
-date_form = DateFormatter("%d-%m-%Y")
-ax.xaxis.set_major_locator(WeekdayLocator(byweekday=(0), interval=3))
-ax.xaxis.set_major_formatter(date_form)
-plt.xticks(rotation=45, fontsize=12)
-#plt.ylim(0,100)
-
-## B) Customizing axes and adding a grid
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
-ax.spines['bottom'].set_color('#3f3f3f')
-ax.spines['left'].set_color('#3f3f3f')
-ax.tick_params(colors='#3f3f3f')
-ax.grid(alpha=1)
-
-## C) Adding a title and axis labels
-plt.ylabel('Total de doses administradas por 100 pessoas', fontsize=18, alpha=0.9)
-plt.xlabel('Date', fontsize=12, alpha=0.9)
-plt.title('Vacinações COVID-19', fontsize=18, weight='bold', alpha=0.9)
-
-# D) Celebrate!
-plt.savefig("data/covid_vac")
-
-
-# Step 1: Load the data
-df = pd.read_csv(
-    'https://covid.ourworldindata.org/data/owid-covid-data.csv',
-    usecols=['date', 'location', 'people_vaccinated'],
-    parse_dates=['date'])
-
-countries = ['United States', 'Germany', 'United Kingdom', 'Brazil', 'Argentina', 'Chile', 'Uruguay']
-df = df[df['location'].isin(countries)]
-
-
-
-# Step 2: Summarize the data
-pivot = pd.pivot_table(
-    data=df,                                    # What dataframe to use
-    index='date',                               # The "rows" of your dataframe
-    columns='location',                         # What values to show as columns
-    values='people_vaccinated',    # What values to aggregate
-    aggfunc='mean',                             # How to aggregate data
-    )
-
-pivot = pivot.fillna(method='ffill')
-
-
-# Step 3: Set up key variables for the visualization
-main_country = 'Brazil'
-colors = {country:('black' if country!= main_country else '#129583') for country in countries}
-alphas = {country:(0.5 if country!= main_country else 1.0) for country in countries}
-
-
-# Step 4: Plot all countries
-fig, ax = plt.subplots(figsize=(12,8))
-fig.patch.set_facecolor('#F5F5F5')    # Change background color to a light grey
-ax.patch.set_facecolor('#F5F5F5')     # Change background color to a light grey
-
-for country in countries:
-    ax.plot(
-        pivot.index,              # What to use as your x-values
-        pivot[country],           # What to use as your y-values
-        color=colors[country],    # How to color your line
-        alpha=alphas[country]     # What transparency to use for your line
-    )
-    ax.text(
-        x = pivot.index[-1] + timedelta(days=2),    # Where to position your text relative to the x-axis
-        y = pivot[country].max(),                   # How high to position your text
-        color = colors[country],
-        fontsize=13,                    # What color to give your text
-        s = country,                                # What to write
-        alpha=alphas[country]                       # What transparency to use
-    )
-    vacs_br = pivot['Brazil']
-
+# Criar diretório de saída se não existir
+output_dir = Path("data")
+output_dir.mkdir(exist_ok=True)
+
+# Função para formatar números grandes
 def reformat_large_tick_values(tick_val, pos):
-    """
-    Turns large tick values (in the billions, millions and thousands) such as 4500 into 4.5K and also appropriately turns 4000 into 4K (no zero after the decimal).
-    """
     if tick_val >= 1000000:
         val = round(tick_val/1000000, 1)
-        new_tick_format = '{:}'.format(val)
-    else:
-        new_tick_format = tick_val
-
-    # make new_tick_format into a string value
-    new_tick_format = str(new_tick_format)
-
-    # code below will keep 4.5M as is but change values such as 4.0M to 4M since that zero after the decimal isn't needed
-    index_of_decimal = new_tick_format.find(".")
-
-    if index_of_decimal != -1:
-        value_after_decimal = new_tick_format[index_of_decimal+1]
-        if value_after_decimal == "0":
-            # remove the 0 after the decimal point since it's not needed
-            new_tick_format = new_tick_format[0:index_of_decimal] + new_tick_format[index_of_decimal+2:]
-
-    return new_tick_format
-
-
-# Step 5: Configures axes
-## A) Format what shows up on axes and how it's displayed
-date_form = DateFormatter("%d-%m-%Y")
-ax.xaxis.set_major_locator(WeekdayLocator(byweekday=(0), interval=3))
-ax.xaxis.set_major_formatter(date_form)
-plt.xticks(rotation=45, fontsize=12)
-ax.yaxis.set_major_formatter(mtick.ScalarFormatter())
-ax.yaxis.get_major_formatter().set_scientific(False)
-ax.yaxis.get_major_formatter().set_useOffset(False)
-ax.yaxis.set_major_formatter(mtick.FuncFormatter(reformat_large_tick_values))
-
-## B) Customizing axes and adding a grid
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
-ax.spines['bottom'].set_color('#3f3f3f')
-ax.spines['left'].set_color('#3f3f3f')
-ax.tick_params(colors='#3f3f3f')
-ax.grid(alpha=1)
-
-## C) Adding a title and axis labels
-plt.ylabel('Total de vacinações por milhão de habitante', fontsize=18, alpha=0.9)
-plt.xlabel('Date', fontsize=12, alpha=0.9)
-plt.title('Vacinações COVID-19', fontsize=18, weight='bold', alpha=0.9)
-
-# D) Celebrate!
-plt.savefig("data/covid_vactot")
-
-def percentage(value, total, multiply=True):
-	try:
-		percent = (value / float(total))
-		if multiply:
-			percent = percent * 100
-		return percent
-	except ZeroDivisionError:
-		return None
-
-
-
-def reformat_large_tick_values(tick_val, pos):
-    """
-    Turns large tick values (in the billions, millions and thousands) such as 4500 into 4.5K and also appropriately turns 4000 into 4K (no zero after the decimal).
-    """
-    if tick_val >= 1000:
+        new_tick_format = '{:}M'.format(val)
+    elif tick_val >= 1000:
         val = round(tick_val/1000, 1)
-        new_tick_format = '{:}'.format(val)
+        new_tick_format = '{:}K'.format(val)
     else:
         new_tick_format = tick_val
-
-    # make new_tick_format into a string value
+    
     new_tick_format = str(new_tick_format)
-
-    # code below will keep 4.5M as is but change values such as 4.0M to 4M since that zero after the decimal isn't needed
     index_of_decimal = new_tick_format.find(".")
-
+    
     if index_of_decimal != -1:
         value_after_decimal = new_tick_format[index_of_decimal+1]
         if value_after_decimal == "0":
-            # remove the 0 after the decimal point since it's not needed
             new_tick_format = new_tick_format[0:index_of_decimal] + new_tick_format[index_of_decimal+2:]
-
+    
     return new_tick_format
 
+# Função para criar gráficos
+def create_plot(data, countries, main_country, y_col, title, ylabel, filename, 
+                colors=None, alphas=None, is_percentage=False):
+    # Configurações padrão
+    if colors is None:
+        colors = {country:('gray' if country != main_country else '#129583') for country in countries}
+    if alphas is None:
+        alphas = {country:(0.7 if country != main_country else 1.0) for country in countries}
+    
+    fig, ax = plt.subplots(figsize=(12, 6))
+    fig.patch.set_facecolor('#F5F5F5')
+    ax.patch.set_facecolor('#F5F5F5')
 
-# Step 1: Load the data
-df = pd.read_csv(
-    'https://covid.ourworldindata.org/data/owid-covid-data.csv',
-    usecols=['date', 'location', 'new_cases_smoothed'],
-    parse_dates=['date'])
+    for country in countries:
+        ax.plot(
+            data.index,
+            data[country],
+            color=colors[country],
+            alpha=alphas[country],
+            linewidth=2
+        )
+        ax.text(
+            x=data.index[-1] + timedelta(days=2),
+            y=data[country].iloc[-1],
+            color=colors[country],
+            fontsize=12,
+            s=country,
+            alpha=alphas[country]
+        )
 
-countries = ['Brazil', 'United States', 'France']
-df = df[df['location'].isin(countries)]
+    # Formatar eixos
+    date_form = DateFormatter("%d-%m-%Y")
+    ax.xaxis.set_major_locator(WeekdayLocator(byweekday=(0), interval=2))
+    ax.xaxis.set_major_formatter(date_form)
+    plt.xticks(rotation=45, fontsize=10)
+    
+    if is_percentage:
+        ax.yaxis.set_major_formatter(mtick.PercentFormatter())
+    else:
+        ax.yaxis.set_major_formatter(mtick.FuncFormatter(reformat_large_tick_values))
 
+    # Customizar eixos
+    for spine in ['top', 'right']:
+        ax.spines[spine].set_visible(False)
+    for spine in ['bottom', 'left']:
+        ax.spines[spine].set_color('#3f3f3f')
+    ax.tick_params(colors='#3f3f3f')
+    ax.grid(True, alpha=0.3)
 
+    # Adicionar rótulos
+    plt.ylabel(ylabel, fontsize=14, alpha=0.9)
+    plt.xlabel('Data', fontsize=12, alpha=0.9)
+    plt.title(title, fontsize=16, weight='bold', pad=20)
 
-# Step 2: Summarize the data
-pivot = pd.pivot_table(
-    data=df,                                    # What dataframe to use
-    index='date',                               # The "rows" of your dataframe
-    columns='location',                         # What values to show as columns
-    values='new_cases_smoothed',    # What values to aggregate
-    aggfunc='mean',                             # How to aggregate data
+    # Salvar figura
+    plt.tight_layout()
+    plt.savefig(output_dir / f"{filename}.png", dpi=300)
+    plt.close()
+
+# Função para carregar e processar dados
+def load_and_process_data(url, cols, countries):
+    df = pd.read_csv(
+        url,
+        usecols=cols,
+        parse_dates=['date']
     )
-
-pivot = pivot.fillna(method='ffill')
-
-
-# Step 3: Set up key variables for the visualization
-main_country = 'Brazil'
-colors = {country:('black' if country!= main_country else '#129583') for country in countries}
-alphas = {country:(0.5 if country!= main_country else 1.0) for country in countries}
-
-
-# Step 4: Plot all countries
-fig, ax = plt.subplots(figsize=(12,8))
-fig.patch.set_facecolor('#F5F5F5')    # Change background color to a light grey
-ax.patch.set_facecolor('#F5F5F5')     # Change background color to a light grey
-
-for country in countries:
-    ax.plot(
-        pivot.index,              # What to use as your x-values
-        pivot[country],           # What to use as your y-values
-        color=colors[country],    # How to color your line
-        alpha=alphas[country]     # What transparency to use for your line
+    df = df[df['location'].isin(countries)]
+    
+    pivot = pd.pivot_table(
+        data=df,
+        index='date',
+        columns='location',
+        values=cols[-1],
+        aggfunc='mean'
     )
-    ax.text(
-        x = pivot.index[-1] + timedelta(days=2),    # Where to position your text relative to the x-axis
-        y = pivot[country].max(),                   # How high to position your text
-        color = colors[country],
-        fontsize=13,                   # What color to give your text
-        s = country,                                # What to write
-        alpha=alphas[country]                       # What transparency to use
+    
+    return pivot.ffill()
+
+# URL base dos dados
+OWID_URL = 'https://covid.ourworldindata.org/data/owid-covid-data.csv'
+
+# 1. Mortes mundiais
+try:
+    pivot_deaths = load_and_process_data(
+        OWID_URL,
+        ['date', 'location', 'new_deaths_smoothed'],
+        ['World']
     )
-
-
-# Step 5: Configures axes
-## A) Format what shows up on axes and how it's displayed
-date_form = DateFormatter("%d-%m-%Y")
-ax.xaxis.set_major_locator(WeekdayLocator(byweekday=(0), interval=3))
-ax.xaxis.set_major_formatter(date_form)
-plt.xticks(rotation=45, fontsize=12)
-ax.yaxis.set_major_formatter(mtick.ScalarFormatter())
-ax.yaxis.get_major_formatter().set_scientific(False)
-ax.yaxis.get_major_formatter().set_useOffset(False)
-ax.yaxis.set_major_formatter(mtick.FuncFormatter(reformat_large_tick_values))
-#plt.ylim(0,100)
-
-## B) Customizing axes and adding a grid
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
-ax.spines['bottom'].set_color('#3f3f3f')
-ax.spines['left'].set_color('#3f3f3f')
-ax.tick_params(colors='#3f3f3f')
-ax.grid(alpha=1)
-
-## C) Adding a title and axis labels
-plt.ylabel('Novos casos diários por milhar', fontsize=18, alpha=0.9)
-plt.xlabel('Date', fontsize=12, alpha=0.9)
-plt.title('Novos casos de COVID-19 no Brasil, EUA e França', fontsize=18, weight='bold', alpha=0.9)
-
-# D) Celebrate!
-plt.savefig("data/covid_ind_cases")
-
-#Gráfico de Novas Mortes
-
-# Step 1: Load the data
-df = pd.read_csv(
-    'https://covid.ourworldindata.org/data/owid-covid-data.csv',
-    usecols=['date', 'location', 'new_deaths_smoothed'],
-    parse_dates=['date'])
-
-countries = ['Brazil','United States','France']
-df = df[df['location'].isin(countries)]
-
-
-
-# Step 2: Summarize the data
-pivot = pd.pivot_table(
-    data=df,                                    # What dataframe to use
-    index='date',                               # The "rows" of your dataframe
-    columns='location',                         # What values to show as columns
-    values='new_deaths_smoothed',    # What values to aggregate
-    aggfunc='mean',                             # How to aggregate data
+    create_plot(
+        pivot_deaths,
+        ['World'],
+        'World',
+        'World',
+        'Mortes diárias por COVID-19 no mundo (média móvel 7 dias)',
+        'Mortes por dia',
+        'world_deaths'
     )
+except Exception as e:
+    print(f"Erro ao processar mortes mundiais: {e}")
 
-pivot = pivot.fillna(method='ffill')
-
-
-# Step 3: Set up key variables for the visualization
-main_country = 'Brazil'
-colors = {country:('black' if country!= main_country else '#129583') for country in countries}
-alphas = {country:(0.5 if country!= main_country else 1.0) for country in countries}
-
-
-# Step 4: Plot all countries
-fig, ax = plt.subplots(figsize=(12,8))
-fig.patch.set_facecolor('#F5F5F5')    # Change background color to a light grey
-ax.patch.set_facecolor('#F5F5F5')     # Change background color to a light grey
-
-for country in countries:
-    ax.plot(
-        pivot.index,              # What to use as your x-values
-        pivot[country],           # What to use as your y-values
-        color=colors[country],    # How to color your line
-        alpha=alphas[country]     # What transparency to use for your line
+# 2. Casos mundiais
+try:
+    pivot_cases = load_and_process_data(
+        OWID_URL,
+        ['date', 'location', 'new_cases_smoothed'],
+        ['World']
     )
-    ax.text(
-        x = pivot.index[-1] + timedelta(days=2),    # Where to position your text relative to the x-axis
-        y = pivot[country].max(),                   # How high to position your text
-        color = colors[country],
-        fontsize=13,                    # What color to give your text
-        s = country,                                # What to write
-        alpha=alphas[country]                       # What transparency to use
+    create_plot(
+        pivot_cases,
+        ['World'],
+        'World',
+        'World',
+        'Casos diários de COVID-19 no mundo (média móvel 7 dias)',
+        'Casos por dia',
+        'world_cases'
     )
-    #vacs_br = pivot['new_deaths_smoothed']
+except Exception as e:
+    print(f"Erro ao processar casos mundiais: {e}")
 
-
-
-# Step 5: Configures axes
-## A) Format what shows up on axes and how it's displayed
-date_form = DateFormatter("%d-%m-%Y")
-ax.xaxis.set_major_locator(WeekdayLocator(byweekday=(0), interval=3))
-ax.xaxis.set_major_formatter(date_form)
-plt.xticks(rotation=45, fontsize=12)
-
-
-## B) Customizing axes and adding a grid
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
-ax.spines['bottom'].set_color('#3f3f3f')
-ax.spines['left'].set_color('#3f3f3f')
-ax.tick_params(colors='#3f3f3f')
-ax.grid(alpha=1)
-
-## C) Adding a title and axis labels
-plt.ylabel('Mortes diárias', fontsize=18, alpha=0.9)
-plt.xlabel('Date', fontsize=12, alpha=0.9)
-plt.title('Mortes em 24h por COVID-19 no Brasil, EUA e França', fontsize=18, weight='bold', alpha=0.9)
-
-# D) Celebrate!
-plt.savefig("data/covid_ind_deaths")
-
-#Gráfico de mortes total
-
-# Step 1: Load the data
-df = pd.read_csv(
-    'https://covid.ourworldindata.org/data/owid-covid-data.csv',
-    usecols=['date', 'location', 'total_deaths'],
-    parse_dates=['date'])
-
-countries = ['Brazil','United States']
-df = df[df['location'].isin(countries)]
-
-
-
-# Step 2: Summarize the data
-pivot = pd.pivot_table(
-    data=df,                                    # What dataframe to use
-    index='date',                               # The "rows" of your dataframe
-    columns='location',                         # What values to show as columns
-    values='total_deaths',    # What values to aggregate
-    aggfunc='mean',                             # How to aggregate data
+# 3. Casos no Brasil
+try:
+    pivot_br_cases = load_and_process_data(
+        OWID_URL,
+        ['date', 'location', 'new_cases_smoothed'],
+        ['Brazil']
     )
-
-pivot = pivot.fillna(method='ffill')
-
-
-# Step 3: Set up key variables for the visualization
-main_country = 'Brazil'
-colors = {country:('black' if country!= main_country else '#129583') for country in countries}
-alphas = {country:(0.5 if country!= main_country else 1.0) for country in countries}
-
-
-# Step 4: Plot all countries
-fig, ax = plt.subplots(figsize=(12,8))
-fig.patch.set_facecolor('#F5F5F5')    # Change background color to a light grey
-ax.patch.set_facecolor('#F5F5F5')     # Change background color to a light grey
-
-for country in countries:
-    ax.plot(
-        pivot.index,              # What to use as your x-values
-        pivot[country],           # What to use as your y-values
-        color=colors[country],    # How to color your line
-        alpha=alphas[country]     # What transparency to use for your line
+    create_plot(
+        pivot_br_cases,
+        ['Brazil'],
+        'Brazil',
+        'Brazil',
+        'Casos diários de COVID-19 no Brasil (média móvel 7 dias)',
+        'Casos por dia',
+        'br_cases'
     )
-    ax.text(
-        x = pivot.index[-1] + timedelta(days=2),    # Where to position your text relative to the x-axis
-        y = pivot[country].max(),                   # How high to position your text
-        color = colors[country],
-        fontsize=13,                    # What color to give your text
-        s = country,                                # What to write
-        alpha=alphas[country]                       # What transparency to use
+except Exception as e:
+    print(f"Erro ao processar casos no Brasil: {e}")
+
+# 4. Vacinações comparadas
+try:
+    pivot_vaccines = load_and_process_data(
+        OWID_URL,
+        ['date', 'location', 'total_vaccinations_per_hundred'],
+        ['United States', 'Germany', 'United Kingdom', 'Brazil', 'Argentina', 'Chile', 'Uruguay']
     )
-    #vacs_br = pivot['new_deaths_smoothed']
-
-
-
-# Step 5: Configures axes
-## A) Format what shows up on axes and how it's displayed
-date_form = DateFormatter("%d-%m-%Y")
-ax.xaxis.set_major_locator(WeekdayLocator(byweekday=(0), interval=3))
-ax.xaxis.set_major_formatter(date_form)
-plt.xticks(rotation=45, fontsize=12)
-
-
-## B) Customizing axes and adding a grid
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
-ax.spines['bottom'].set_color('#3f3f3f')
-ax.spines['left'].set_color('#3f3f3f')
-ax.tick_params(colors='#3f3f3f')
-ax.grid(alpha=1)
-
-## C) Adding a title and axis labels
-plt.ylabel('Total de Mortes', fontsize=18, alpha=0.9)
-plt.xlabel('Date', fontsize=12, alpha=0.9)
-plt.title('Total de Mortes por COVID-19 no Brasil e nos EUA', fontsize=18, weight='bold', alpha=0.9)
-
-# D) Celebrate!
-plt.savefig("data/covid_ind_totdeaths")
-
-
-# Step 1: Load the data
-df = pd.read_csv(
-    'https://covid.ourworldindata.org/data/owid-covid-data.csv',
-    usecols=['date', 'location', 'new_deaths_smoothed'],
-    parse_dates=['date'])
-
-countries = ['Brazil']
-df = df[df['location'].isin(countries)]
-
-
-
-# Step 2: Summarize the data
-pivot = pd.pivot_table(
-    data=df,                                    # What dataframe to use
-    index='date',                               # The "rows" of your dataframe
-    columns='location',                         # What values to show as columns
-    values='new_deaths_smoothed',   		# What values to aggregate
-    aggfunc='mean',                             # How to aggregate data
+    create_plot(
+        pivot_vaccines,
+        pivot_vaccines.columns.tolist(),
+        'Brazil',
+        'Brazil',
+        'Vacinação contra COVID-19 (doses por 100 pessoas)',
+        'Doses administradas por 100 pessoas',
+        'vaccines_comparison'
     )
+except Exception as e:
+    print(f"Erro ao processar dados de vacinação: {e}")
 
-pivot = pivot.fillna(method='ffill')
-
-
-# Step 3: Set up key variables for the visualization
-main_country = 'Brazil'
-colors = {country:('black' if country!= main_country else '#129583') for country in countries}
-alphas = {country:(0.5 if country!= main_country else 1.0) for country in countries}
-
-
-# Step 4: Plot all countries
-fig, ax = plt.subplots(figsize=(12,8))
-fig.patch.set_facecolor('#F5F5F5')    # Change background color to a light grey
-ax.patch.set_facecolor('#F5F5F5')     # Change background color to a light grey
-
-for country in countries:
-    ax.plot(
-        pivot.index,              # What to use as your x-values
-        pivot[country],           # What to use as your y-values
-        color=colors[country],    # How to color your line
-        alpha=alphas[country]     # What transparency to use for your line
+# 5. Comparação de casos entre países
+try:
+    pivot_country_cases = load_and_process_data(
+        OWID_URL,
+        ['date', 'location', 'new_cases_smoothed'],
+        ['Brazil', 'United States', 'France']
     )
-    ax.text(
-        x = pivot.index[-1] + timedelta(days=2),    # Where to position your text relative to the x-axis
-        y = pivot[country].max(),                   # How high to position your text
-        color = colors[country],
-        fontsize=13,                   # What color to give your text
-        s = country,                                # What to write
-        alpha=alphas[country]                       # What transparency to use
+    create_plot(
+        pivot_country_cases,
+        pivot_country_cases.columns.tolist(),
+        'Brazil',
+        'Brazil',
+        'Casos diários de COVID-19 (média móvel 7 dias)',
+        'Casos por dia',
+        'country_cases_comparison'
     )
+except Exception as e:
+    print(f"Erro ao processar comparação de casos: {e}")
 
-
-# Step 5: Configures axes
-## A) Format what shows up on axes and how it's displayed
-date_form = DateFormatter("%d-%m-%Y")
-ax.xaxis.set_major_locator(WeekdayLocator(byweekday=(0), interval=3))
-ax.xaxis.set_major_formatter(date_form)
-plt.xticks(rotation=45, fontsize=12)
-#plt.ylim(0,100)
-
-## B) Customizing axes and adding a grid
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
-ax.spines['bottom'].set_color('#3f3f3f')
-ax.spines['left'].set_color('#3f3f3f')
-ax.tick_params(colors='#3f3f3f')
-ax.grid(alpha=1)
-
-## C) Adding a title and axis labels
-plt.ylabel('Mortes diárias', fontsize=18, alpha=0.9)
-plt.xlabel('Date', fontsize=12, alpha=0.9)
-plt.title('Mortes em 24h por COVID-19 no Brasil', fontsize=18, weight='bold', alpha=0.9)
-
-# D) Celebrate!
-plt.savefig("data/br_deaths")
-
-
-#Gráfico de mortes total no mundo
-
-# Step 1: Load the data
-df = pd.read_csv(
-    'https://covid.ourworldindata.org/data/owid-covid-data.csv',
-    usecols=['date', 'location', 'total_deaths'],
-    parse_dates=['date'])
-
-countries = ['World']
-df = df[df['location'].isin(countries)]
-
-
-
-# Step 2: Summarize the data
-pivot = pd.pivot_table(
-    data=df,                                    # What dataframe to use
-    index='date',                               # The "rows" of your dataframe
-    columns='location',                         # What values to show as columns
-    values='total_deaths',    # What values to aggregate
-    aggfunc='mean',                             # How to aggregate data
+# 6. Mortes no Brasil
+try:
+    pivot_br_deaths = load_and_process_data(
+        OWID_URL,
+        ['date', 'location', 'new_deaths_smoothed'],
+        ['Brazil']
     )
-
-pivot = pivot.fillna(method='ffill')
-
-
-# Step 3: Set up key variables for the visualization
-main_country = 'Brazil'
-colors = {country:('black' if country!= main_country else '#129583') for country in countries}
-alphas = {country:(0.5 if country!= main_country else 1.0) for country in countries}
-
-
-# Step 4: Plot all countries
-fig, ax = plt.subplots(figsize=(12,8))
-fig.patch.set_facecolor('#F5F5F5')    # Change background color to a light grey
-ax.patch.set_facecolor('#F5F5F5')     # Change background color to a light grey
-
-for country in countries:
-    ax.plot(
-        pivot.index,              # What to use as your x-values
-        pivot[country],           # What to use as your y-values
-        color=colors[country],    # How to color your line
-        alpha=alphas[country]     # What transparency to use for your line
+    create_plot(
+        pivot_br_deaths,
+        ['Brazil'],
+        'Brazil',
+        'Brazil',
+        'Mortes diárias por COVID-19 no Brasil (média móvel 7 dias)',
+        'Mortes por dia',
+        'br_deaths'
     )
-    ax.text(
-        x = pivot.index[-1] + timedelta(days=2),    # Where to position your text relative to the x-axis
-        y = pivot[country].max(),                   # How high to position your text
-        color = colors[country],
-        fontsize=13,                    # What color to give your text
-        s = country,                                # What to write
-        alpha=alphas[country]                       # What transparency to use
-    )
-    #vacs_br = pivot['new_deaths_smoothed']
+except Exception as e:
+    print(f"Erro ao processar mortes no Brasil: {e}")
 
-
-
-# Step 5: Configures axes
-## A) Format what shows up on axes and how it's displayed
-date_form = DateFormatter("%d-%m-%Y")
-ax.xaxis.set_major_locator(WeekdayLocator(byweekday=(0), interval=3))
-ax.xaxis.set_major_formatter(date_form)
-plt.xticks(rotation=45, fontsize=12)
-
-
-## B) Customizing axes and adding a grid
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
-ax.spines['bottom'].set_color('#3f3f3f')
-ax.spines['left'].set_color('#3f3f3f')
-ax.tick_params(colors='#3f3f3f')
-ax.grid(alpha=1)
-
-## C) Adding a title and axis labels
-plt.ylabel('Total de Mortes', fontsize=18, alpha=0.9)
-plt.xlabel('Date', fontsize=12, alpha=0.9)
-plt.title('Total de Mortes por COVID-19 no Mundo', fontsize=18, weight='bold', alpha=0.9)
-
-# D) Celebrate!
-plt.savefig("data/world_totdeaths")
+print("Processamento concluído. Gráficos salvos em:", output_dir)
